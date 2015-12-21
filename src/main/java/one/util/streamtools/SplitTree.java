@@ -9,106 +9,103 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 public class SplitTree {
-	private final Node root;
-	
-	private SplitTree(Node root) {
-		this.root = root;
-	}
+    private final Node root;
 
-	private static class Node {
-		private String first, last;
-		private Node left, right;
+    private SplitTree(Node root) {
+        this.root = root;
+    }
 
-		void accept(Object obj) {
-			if (first == null)
-				first = obj.toString();
-			else
-				last = obj.toString();
-		}
+    private static class Node {
+        private String first, last;
+        private Node left, right;
 
-		Node combine(Node that) {
-			Node p = new Node();
-			p.first = first == null ? that.first : first;
-			p.last = Stream.of(that.last, that.first, this.last, this.first)
-					.filter(Objects::nonNull).findFirst().orElse(null);
-			p.left = this;
-			p.right = that;
-			return p;
-		}
+        void accept(Object obj) {
+            if (first == null)
+                first = obj.toString();
+            else
+                last = obj.toString();
+        }
 
-		String pad(String s, int left, int len) {
-			if (len == s.length())
-				return s;
-			char[] result = new char[len];
-			Arrays.fill(result, ' ');
-			s.getChars(0, s.length(), result, left);
-			return new String(result);
-		}
+        Node combine(Node that) {
+            Node p = new Node();
+            p.first = first == null ? that.first : first;
+            p.last = Stream.of(that.last, that.first, this.last, this.first).filter(Objects::nonNull).findFirst()
+                    .orElse(null);
+            p.left = this;
+            p.right = that;
+            return p;
+        }
 
-		List<String> asLines() {
-			String cur = toString();
-			if (left == null) {
-				return Collections.singletonList(cur);
-			}
-			List<String> l = left.asLines();
-			List<String> r = right.asLines();
-			int len1 = l.get(0).length();
-			int len2 = r.get(0).length();
-			int totalLen = len1 + len2 + 1;
-			int leftAdd = 0;
-			if (cur.length() < totalLen) {
-				cur = pad(cur, (totalLen - cur.length()) / 2, totalLen);
-			} else {
-				leftAdd = (cur.length() - totalLen) / 2;
-				totalLen = cur.length();
-			}
-			List<String> result = new ArrayList<>();
-			result.add(cur);
+        String pad(String s, int left, int len) {
+            if (len == s.length())
+                return s;
+            char[] result = new char[len];
+            Arrays.fill(result, ' ');
+            s.getChars(0, s.length(), result, left);
+            return new String(result);
+        }
 
-			char[] dashes = new char[totalLen];
-			Arrays.fill(dashes, ' ');
-			Arrays.fill(dashes, len1 / 2 + leftAdd + 1, len1 + len2 / 2 + 1
-					+ leftAdd, '_');
-			int mid = totalLen / 2;
-			dashes[mid] = '/';
-			dashes[mid + 1] = '\\';
-			result.add(new String(dashes));
+        List<String> asLines() {
+            String cur = toString();
+            if (left == null) {
+                return Collections.singletonList(cur);
+            }
+            List<String> l = left.asLines();
+            List<String> r = right.asLines();
+            int len1 = l.get(0).length();
+            int len2 = r.get(0).length();
+            int totalLen = len1 + len2 + 1;
+            int leftAdd = 0;
+            if (cur.length() < totalLen) {
+                cur = pad(cur, (totalLen - cur.length()) / 2, totalLen);
+            } else {
+                leftAdd = (cur.length() - totalLen) / 2;
+                totalLen = cur.length();
+            }
+            List<String> result = new ArrayList<>();
+            result.add(cur);
 
-			Arrays.fill(dashes, ' ');
-			dashes[len1 / 2 + leftAdd] = '|';
-			dashes[len1 + len2 / 2 + 1 + leftAdd] = '|';
-			result.add(new String(dashes));
+            char[] dashes = new char[totalLen];
+            Arrays.fill(dashes, ' ');
+            Arrays.fill(dashes, len1 / 2 + leftAdd + 1, len1 + len2 / 2 + 1 + leftAdd, '_');
+            int mid = totalLen / 2;
+            dashes[mid] = '/';
+            dashes[mid + 1] = '\\';
+            result.add(new String(dashes));
 
-			int maxSize = Math.max(l.size(), r.size());
-			for (int i = 0; i < maxSize; i++) {
-				String lstr = l.size() > i ? l.get(i) : String.format("%"
-						+ len1 + "s", "");
-				String rstr = r.size() > i ? r.get(i) : String.format("%"
-						+ len2 + "s", "");
-				result.add(pad(lstr + " " + rstr, leftAdd, totalLen));
-			}
-			return result;
-		}
+            Arrays.fill(dashes, ' ');
+            dashes[len1 / 2 + leftAdd] = '|';
+            dashes[len1 + len2 / 2 + 1 + leftAdd] = '|';
+            result.add(new String(dashes));
 
-		@Override
-		public String toString() {
-			if (first == null)
-				return "(empty)";
-			else if (last == null)
-				return "[" + first + "]";
-			return "[" + first + ".." + last + "]";
-		}
-	}
-	
-	public List<String> asLines() {
-		return root.asLines();
-	}
-	
-	public String asString() {
-		return String.join("\n", root.asLines());
-	}
-	
-	public static Collector<Object, ?, SplitTree> collector() {
-		return Collector.of(Node::new, Node::accept, Node::combine, SplitTree::new);
-	}
+            int maxSize = Math.max(l.size(), r.size());
+            for (int i = 0; i < maxSize; i++) {
+                String lstr = l.size() > i ? l.get(i) : String.format("%" + len1 + "s", "");
+                String rstr = r.size() > i ? r.get(i) : String.format("%" + len2 + "s", "");
+                result.add(pad(lstr + " " + rstr, leftAdd, totalLen));
+            }
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            if (first == null)
+                return "(empty)";
+            else if (last == null)
+                return "[" + first + "]";
+            return "[" + first + ".." + last + "]";
+        }
+    }
+
+    public List<String> asLines() {
+        return root.asLines();
+    }
+
+    public String asString() {
+        return String.join("\n", root.asLines());
+    }
+
+    public static Collector<Object, ?, SplitTree> collector() {
+        return Collector.of(Node::new, Node::accept, Node::combine, SplitTree::new);
+    }
 }
