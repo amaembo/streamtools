@@ -51,8 +51,8 @@ public class SplitTreeTest {
         long end = System.nanoTime();
         assertEquals(5, tree.nodes().count());
         assertEquals("      [1..6]      \n"+
-                    "      ___/\\___    \n"+
-                    "     |        |   \n"+
+                    "       __/\\____   \n"+
+                    "      |        |  \n"+
                     "   [1..6]  (empty)\n"+
                     "    __/\\__        \n"+
                     "   |      |       \n"+
@@ -68,9 +68,9 @@ public class SplitTreeTest {
     @Test
     public void testParallel() {
         SplitTree tree = Stream.of(1, 2).parallel().collect(SplitTree.collector());
-        assertEquals(Arrays.asList("[1..2] ", "  _/\\  ", " |   | ", "[1] [2]"),
+        assertEquals(Arrays.asList("[1..2] ", "  _/\\_ ", " |    |", "[1] [2]"),
                 tree.asLines());
-        assertEquals("[1..2] \n" + "  _/\\  \n" + " |   | \n" + "[1] [2]",
+        assertEquals("[1..2] \n  _/\\_ \n" + " |    |\n[1] [2]",
                 tree.toString());
     }
     
