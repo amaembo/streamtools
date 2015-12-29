@@ -8,6 +8,11 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+/**
+ * Representation of Stream splitting tree
+ * 
+ * @author Tagir Valeev
+ */
 public class SplitTree {
     private final SplitNode root;
     
@@ -40,6 +45,12 @@ public class SplitTree {
     
     public SplitNode root() {
         return root;
+    }
+
+    public long totalNanos() {
+        long min = nodes().mapToLong(SplitNode::getStartNanos).min().getAsLong();
+        long max = nodes().mapToLong(SplitNode::getEndNanos).max().getAsLong();
+        return max-min;
     }
 
     public Stream<SplitNode> nodes() {

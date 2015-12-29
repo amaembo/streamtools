@@ -42,7 +42,15 @@ public class SplitNode {
     public SplitNode getLeft() {
         return left;
     }
+    
+    public String getFirst() {
+        return first;
+    }
 
+    public String getLast() {
+        return last;
+    }
+    
     /**
      * @return the right child (or null for leaf node)
      */
