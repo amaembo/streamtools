@@ -71,6 +71,13 @@ public class SplitNode {
     public boolean isLeaf() {
         return left == null;
     }
+    
+    /**
+     * @return true if this node collected no elements
+     */
+    public boolean isEmpty() {
+        return first == null;
+    }
 
     /**
      * @return the result of System.nanoTime() when this node was created 
